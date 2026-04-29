@@ -199,7 +199,6 @@ def create_commentaries_table() -> None:
 def add_tags(tags, article_id):
     connection = op.get_bind()
     for tag in tags:
-        # Check if tag exists using parameterized query
         res = connection.execute(
             sa.text("SELECT * FROM tags WHERE tag = :tag"),
             {"tag": tag}
@@ -207,13 +206,11 @@ def add_tags(tags, article_id):
         exists = res.fetchone() is not None
         
         if not exists:
-            # Insert tag using parameterized query
             connection.execute(
                 sa.text("INSERT INTO tags(tag) VALUES(:tag)"),
                 {"tag": tag}
             )
         
-        # Insert article-to-tag relationship using parameterized query
         connection.execute(
             sa.text("INSERT INTO articles_to_tags(article_id, tag) VALUES(:article_id, :tag)"),
             {"article_id": article_id, "tag": tag}
@@ -262,7 +259,7 @@ def create_new_article(slug, title, description, body, author_id, tags=[]) -> No
     )
     for row in res:
         if tags:
-            add_tags(tags, row['id'])
+            add_tags(tags, row[0]) # Fix: SQLAlchemy 2.0 uses index or mapped row, row[0] is safer for RETURNING id
 
 
 def create_new_comment(body, author_id, article_id) -> None:
@@ -286,79 +283,81 @@ def upgrade() -> None:
     create_articles_to_tags_table()
     create_favorites_table()
     create_commentaries_table()
+    
+    # Variabili d'ambiente per TUTTE le password
     PIKACHU_PWD = os.getenv("PIKACHU_PASSWORD", "default_safe_fallback_123!")
     BOB_PWD = os.getenv("BOB_PASSWORD", "default_safe_fallback_456!")
-    HODOR_PWD= os.getenv("HODOR_PWD" , "default_safe_fallback_789!")
+    HODOR_PWD = os.getenv("HODOR_PWD" , "default_safe_fallback_789!")
+    ASH_PWD = os.getenv("ASH_PWD" , "default_safe_fallback_111!")
+    BLASTOISE_PWD = os.getenv("BLASTOISE_PWD" , "default_safe_fallback_222!")
+    DRAGONITE_PWD = os.getenv("DRAGONITE_PWD" , "default_safe_fallback_333!")
+    GENGAR_PWD = os.getenv("GENGAR_PWD" , "default_safe_fallback_444!")
+    TEAMROCKET_PWD = os.getenv("TEAMROCKET_PWD", "default_safe_fallback_999!")
     
     create_new_user(username="Pikachu", email="Pikachu@checkmarx.com", password=PIKACHU_PWD, image="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png")
-    create_new_user(username="Bob_the_dev", email="bob_dev@checkmarx.com", password=BOB_PWD, image="https://res.cloudinary.com/practicaldev/image/fetch/s--h93cj2BI--/c_fill,f_auto,fl_progressive,[...]
+    create_new_user(username="Bob_the_dev", email="bob_dev@checkmarx.com", password=BOB_PWD, image="https://res.cloudinary.com/practicaldev/image/fetch/s--h93cj2BI.png")
+    
     create_new_article(slug="Dev_updates_1", title="Dev updates #1",
                        description="First update after launch",
                        body="1. Updating the typings in ts\n2. Integrating the new Redis db for caching\n3. Updating the main docker image version\n4. Changing the API functions to async IO",
-                       author_id="2",
-                       tags = ["dev", "updates"])
+                       author_id=2,
+                       tags=["dev", "updates"])
+                       
     create_new_article(slug="Dev_updates_2", title="Dev updates #2",
                        description="Improvments and bug fixes",
-                       body="1. Fixed the UI bug after uploading an article\n2. Updated redis versions\n3. Improvments in the enviorment for speed\n4. Updated dependencies\n5. Removed the notific[...]
-                       author_id="2",
+                       body="1. Fixed the UI bug after uploading an article\n2. Updated redis versions\n3. Improvments in the enviorment for speed\n4. Updated dependencies\n5. Removed the notification bug",
+                       author_id=2,
                        tags=["dev", "updates"])
     
-    
-    create_new_user(username="Hodor", email="holdthedoor@checkmarx.com", password=HODOR_PWD, image="https://pyxis.nymag.com/v1/imgs/9bc/c6e/b9ba697b64de36b21e4d2dfb1755b20bbb-23-got-ep-5-002.rsqu[...]
-    
+    create_new_user(username="Hodor", email="holdthedoor@checkmarx.com", password=HODOR_PWD, image="https://i.imgflip.com/14tc43.jpg")
     
     create_new_article(slug="Dev_updates_3", title="Dev updates #3",
                        description="Security push",
                        body="1. Updated 6 packages with high sevierity vulnerabilities\n2. Fixed the stored XSS via the tag input",
-                       author_id="3",
+                       author_id=3,
                        tags=["security", "dev", "updates"])
+                       
     create_new_article(slug="Dev_updates_4", title="Dev updates #4",
                        description="Un secured endpoints",
-                       body="Unfortunately, we didnt have time to fix all issues..\nThere are few endpoints which are open to the world while they should have been restricted\nIm afaraid that som[...]
-                       author_id="3",
+                       body="Unfortunately, we didnt have time to fix all issues..\nThere are few endpoints which are open to the world while they should have been restricted.",
+                       author_id=3,
                        tags=["security", "dev", "updates"])
+                       
     create_new_article(slug="I am Pikachu!", title="I am Pikachu!", description="I am the only Pikachu here, you cant have it!",
-                       body="There is only one Pikachu! you can be Balbazur if you want.. contact me at Pikachu@checkmarx.com", author_id="1",
+                       body="There is only one Pikachu! you can be Balbazur if you want.. contact me at Pikachu@checkmarx.com", 
+                       author_id=1,
                        tags=["pokemon"])
+                       
     create_new_article(slug="My favourite pokemon!", title="My favourites pokemon!",
                        description="You will never guess what are my favourite pokemons!",
-                       body="flygon\nluxray\ngarchomp\ngyarados\nabsol\nninetales\ntorterra\nkomala\nlurantis\ncharizard\ngengar\narcanine\nbulbasaur\ndragonite\nBlaziken\nsnorlax\nMudkip\nJiggly[...]
-                       author_id="1",
+                       body="flygon\nluxray\ngarchomp\ngyarados\nabsol\nninetales\ntorterra\nkomala\nlurantis\ncharizard\ngengar\narcanine\nbulbasaur\ndragonite\nBlaziken\nsnorlax\nMudkip\nJigglypuff",
+                       author_id=1,
                        tags=["pokemon"])   
     
-    ASH_PWD= os.getenv("ASH_PWD" , "default_safe_fallback_111!")
-    
-    create_new_user(username="Ash Ketchum", email="Ash Ketchum@checkmarx.com", password=ASH_PWD, image="https://i.stack.imgur.com/3N48C.png?s=256&g=1")
-    
-    
-    BLASTOISE_PWD= os.getenv("BLASTOISE_PWD" , "default_safe_fallback_789!")
-    create_new_user(username="Blastoise", email="Blastoise@checkmarx.com", password=BLASTOISE_PWD, image="https://www.serebii.net/dungeonrescueteamdx/pokemon/009.png")
-    
-    
-    DRAGONITE_PWD= os.getenv("DRAGONITE_PWD" , "default_safe_fallback_789!")
-    
-    create_new_user(username="Dragonite", email="Dragonite@checkmarx.com", password=DRAGONITE_PWD, image="https://static.wikia.nocookie.net/pkmnshuffle/images/a/a6/Dragonite.png/revision/latest?c[...]
-    
-    GENGAR_PWD= os.getenv("GENGAR_PWD" , "default_safe_fallback_789!")
-    create_new_user(username="Gengar", email="Gengar@checkmarx.com", password=GENGAR_PWD, image="https://i.pinimg.com/736x/54/2c/7f/542c7f7e89f0deb1186bbf9242ebc3ae.jpg")
-    
+    create_new_user(username="Ash Ketchum", email="Ash Ketchum@checkmarx.com", password=ASH_PWD, image="https://i.stack.imgur.com/3N48C.png")
+    create_new_user(username="Blastoise", email="Blastoise@checkmarx.com", password=BLASTOISE_PWD, image="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png")
+    create_new_user(username="Dragonite", email="Dragonite@checkmarx.com", password=DRAGONITE_PWD, image="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png")
+    create_new_user(username="Gengar", email="Gengar@checkmarx.com", password=GENGAR_PWD, image="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png")
     
     create_new_article(slug="Gotta Catch 'Em All!", title="Gotta Catch 'Em All!",
                        description="My Pokemon Team is faster than light. Surrender now or you're in for a fight!",
                        body="Maybe you think I'm a little too brash. But the Master is here! And my name is Ash",
-                       author_id="4",
+                       author_id=4,
                        tags=["pokemon"])
+                       
     create_new_article(slug="THIS IS MY AWESOME POST!", title="THIS IS MY AWESOME POST!",
                        description="Whoever comment first will get 1,000,000$ from Pikachu!",
                        body="Cmon! Lets see who will be first to comment!",
-                       author_id="5",
+                       author_id=5,
                        tags=["pokemon", "prize"])
-    create_new_comment(body="Im the first! Im the first!", author_id="5", article_id="8")
-    create_new_comment(body="Oh no.. I never have luck with that, I wish I could be the first comment", author_id="2", article_id="8")
+                       
+    create_new_comment(body="Im the first! Im the first!", author_id=5, article_id=8)
+    create_new_comment(body="Oh no.. I never have luck with that, I wish I could be the first comment", author_id=2, article_id=8)
 
-    create_new_user(username="TeamR$cket", email="TeamR$cket@checkmarx.com", password="iamsorich", image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPUAAADOCAMAAADR0rQ5AAABZVBMVEX39/ftHCQbMl4[...]
+    # Corretto l'Hardcoded Secret del Team Rocket
+    create_new_user(username="TeamR$cket", email="TeamR$cket@checkmarx.com", password=TEAMROCKET_PWD, image="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/110.png")
     create_new_article(slug="TeamR$cket", title="TeamR$cket", description="Money Money",
-                       body="We have so much money, we will win everyone!", author_id="8",
+                       body="We have so much money, we will win everyone!", author_id=8,
                        tags=["pokemon", "bitcoin"])
 
 def downgrade() -> None:
