@@ -8,6 +8,7 @@ Create Date: 2019-09-22 01:36:44.791880
 from typing import Tuple
 
 import sqlalchemy as sa
+import os
 from alembic import op
 from sqlalchemy import func
 from app.services import security
@@ -264,10 +265,10 @@ def upgrade() -> None:
     create_commentaries_table()
     PIKACHU_PWD = os.getenv("PIKACHU_PASSWORD", "default_safe_fallback_123!")
     BOB_PWD = os.getenv("BOB_PASSWORD", "default_safe_fallback_456!")
+    HODOR_PWD= os.getenv("HODOR_PWD" , "default_safe_fallback_789!")
     
-    
-    create_new_user(username="Pikachu", email="Pikachu@checkmarx.com", password="snorlax", image="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png")
-    create_new_user(username="Bob_the_dev", email="bob_dev@checkmarx.com", password="IamDev", image="https://res.cloudinary.com/practicaldev/image/fetch/s--h93cj2BI--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/336281/766eff39-964e-4acc-a390-bc0e2bc9d459.jpg")
+    create_new_user(username="Pikachu", email="Pikachu@checkmarx.com", password=PIKACHU_PWD, image="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png")
+    create_new_user(username="Bob_the_dev", email="bob_dev@checkmarx.com", password=BOB_PWD, image="https://res.cloudinary.com/practicaldev/image/fetch/s--h93cj2BI--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/336281/766eff39-964e-4acc-a390-bc0e2bc9d459.jpg")
     create_new_article(slug="Dev_updates_1", title="Dev updates #1",
                        description="First update after launch",
                        body="1. Updating the typings in ts\n2. Integrating the new Redis db for caching\n3. Updating the main docker image version\n4. Changing the API functions to async IO",
@@ -278,7 +279,11 @@ def upgrade() -> None:
                        body="1. Fixed the UI bug after uploading an article\n2. Updated redis versions\n3. Improvments in the enviorment for speed\n4. Updated dependencies\n5. Removed the notification feature",
                        author_id="2",
                        tags=["dev", "updates"])
-    create_new_user(username="Hodor", email="holdthedoor@checkmarx.com", password="NoSecIssues", image="https://pyxis.nymag.com/v1/imgs/9bc/c6e/b9ba697b64de36b21e4d2dfb1755b20bbb-23-got-ep-5-002.rsquare.w700.jpg")
+    
+    
+    create_new_user(username="Hodor", email="holdthedoor@checkmarx.com", password=HODOR_PWD, image="https://pyxis.nymag.com/v1/imgs/9bc/c6e/b9ba697b64de36b21e4d2dfb1755b20bbb-23-got-ep-5-002.rsquare.w700.jpg")
+    
+    
     create_new_article(slug="Dev_updates_3", title="Dev updates #3",
                        description="Security push",
                        body="1. Updated 6 packages with high sevierity vulnerabilities\n2. Fixed the stored XSS via the tag input",
@@ -296,11 +301,25 @@ def upgrade() -> None:
                        description="You will never guess what are my favourite pokemons!",
                        body="flygon\nluxray\ngarchomp\ngyarados\nabsol\nninetales\ntorterra\nkomala\nlurantis\ncharizard\ngengar\narcanine\nbulbasaur\ndragonite\nBlaziken\nsnorlax\nMudkip\nJigglypuff\nninetals\nsquirtle",
                        author_id="1",
-                       tags=["pokemon"])
-    create_new_user(username="Ash Ketchum", email="Ash Ketchum@checkmarx.com", password="Gotta Catch ’Em All", image="https://i.stack.imgur.com/3N48C.png?s=256&g=1")
-    create_new_user(username="Blastoise", email="Blastoise@checkmarx.com", password="powerfulwater", image="https://www.serebii.net/dungeonrescueteamdx/pokemon/009.png")
-    create_new_user(username="Dragonite", email="Dragonite@checkmarx.com", password="firebomb", image="https://static.wikia.nocookie.net/pkmnshuffle/images/a/a6/Dragonite.png/revision/latest?cb=20170407191605")
-    create_new_user(username="Gengar", email="Gengar@checkmarx.com", password="ghostly", image="https://i.pinimg.com/736x/54/2c/7f/542c7f7e89f0deb1186bbf9242ebc3ae.jpg")
+                       tags=["pokemon"])   
+    
+    ASH_PWD= os.getenv("ASH_PWD" , "default_safe_fallback_111!")
+    
+    create_new_user(username="Ash Ketchum", email="Ash Ketchum@checkmarx.com", password=ASH_PWD, image="https://i.stack.imgur.com/3N48C.png?s=256&g=1")
+    
+    
+    BLASTOISE_PWD= os.getenv("BLASTOISE_PWD" , "default_safe_fallback_789!")
+    create_new_user(username="Blastoise", email="Blastoise@checkmarx.com", password=BLASTOISE_PWD, image="https://www.serebii.net/dungeonrescueteamdx/pokemon/009.png")
+    
+    
+    DRAGONITE_PWD= os.getenv("DRAGONITE_PWD" , "default_safe_fallback_789!")
+    
+    create_new_user(username="Dragonite", email="Dragonite@checkmarx.com", password=DRAGONITE_PWD, image="https://static.wikia.nocookie.net/pkmnshuffle/images/a/a6/Dragonite.png/revision/latest?cb=20170407191605")
+    
+    GENGAR_PWD= os.getenv("GENGAR_PWD" , "default_safe_fallback_789!")
+    create_new_user(username="Gengar", email="Gengar@checkmarx.com", password=GENGAR_PWD, image="https://i.pinimg.com/736x/54/2c/7f/542c7f7e89f0deb1186bbf9242ebc3ae.jpg")
+    
+    
     create_new_article(slug="Gotta Catch ’Em All!", title="Gotta Catch ’Em All!",
                        description="My Pokemon Team is faster than light. Surrender now or you’re in for a fight!",
                        body="Maybe you think I’m a little too brash. But the Master is here! And my name is Ash",
