@@ -15,24 +15,22 @@ router = APIRouter()
 
 
 def execute(cmd):
-    if cmd.startswith("uptime"):
-        p = subprocess.Popen(cmd, shell=True,
-                             stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE,
-                             close_fds=True)
-        err = p.stderr.read()
-        if "rm" in cmd:
-            return 0, "Don't delete anything!"
-        if "||" in cmd:
-            return 0, "injection block"
-        if cmd.replace(" ", "") == "uptime" or cmd.replace(" ", "") == "uptime;":
-            return 1, p.stdout.read().decode()
-        if cmd != "uptime" and len(err) == 0:
-            return 2, p.stdout.read().decode()
-        else:
-            return 0, "Error"
-    return 0, {"whitelist": {"commands": ['uptime']}}
+    # 1. IL BUTTAFUORI: Se non è esattamente "uptime", scartalo e digli cosa è concesso
+    if cmd.strip() != "uptime":
+        return 0, {"whitelist": {"commands": ['uptime']}}
+        
+    # 2. L'ESECUZIONE: Se arriva qui, siamo matematicamente certi che il comando è "uptime"
+    p = subprocess.Popen(["uptime"],
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    
+    stdout, stderr = p.communicate() 
+    
+    # 3. IL RISULTATO: Esecuzione andata a buon fine
+    if p.returncode == 0:
+        return 1, stdout.decode()
+    else:
+        return 0, "Error"
 
 @router.post(
     "",
