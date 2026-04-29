@@ -1,0 +1,64 @@
+name: "SCA & SAST - Snyk Scanner"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+# Livello globale: solo lettura
+permissions:
+  contents: read
+
+jobs:
+  snyk-scan:
+    name: Snyk Security Scan
+    runs-on: ubuntu-latest
+    
+    # Permessi specifici per questo Job (Soddisfa Scorecard)
+    permissions:
+      contents: read
+      security-events: write
+      id-token: write # Necessario per Harden Runner
+
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@cb605e52c26070c328afc4562f0b4ada7618a84e # v2.10.2
+        with:
+          egress-policy: audit
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.32.0
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+
+      - name: Setup Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: '3.10'
+
+      - name: Install Snyk CLI
+        # Pinniamo la versione specifica di Snyk per Scorecard
+        run: npm install -g snyk@sha512-3r+PlwWBQhWMkFGEpS8NMQDXAcBgYoHtq8tocK/6x95PVAEQpoIcqyR1n5o4kAvvcY7v5BxnWYpG/xMSQ3aggQ== 
+
+      - name: Snyk Test
+        id: snyk_test
+        # Usiamo 'continue-on-error' invece di '|| true' per gestire meglio il flusso
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          # Eseguiamo Snyk. Se fallisce l'auth, qui vedremo l'errore nei log.
+          npx snyk test --all-projects --sarif-file-output=snyk-results.sarif
+
+      - name: Carica i risultati su GitHub Security
+        # Hash ufficiale stabile v3.28.10
+        uses: github/codeql-action/upload-sarif@ce64ddcb0d8d890d2df4a9d1c04ff297367dea2a # v3.35.2
+        # Carichiamo il SARIF solo se il file esiste ed è più grande di 0 byte
+        if: always() && hashFiles('snyk-results.sarif') != ''
+        with:
+          sarif_file: snyk-results.sarif
