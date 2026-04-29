@@ -1,0 +1,64 @@
+name: "Build and Security Scan Image"
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-scan:
+    name: Build and Scan
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      # 1. Build dell'immagine locale (senza caricarla ancora)
+      - name: Build Docker image
+        run: docker build -t php-goof:${{ github.sha }} .
+
+      # 2. Scansione dell'immagine appena creata
+      - name: Run Trivy vulnerability scanner (Image)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # master
+        with:
+          image-ref: 'php-goof:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-image-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+
+      # 3. Scansione del File System (per le dipendenze PHP/Composer)
+      - name: Run Trivy vulnerability scanner (Repo)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # master
+        with:
+          scan-type: 'fs'
+          format: 'sarif'
+          output: 'trivy-fs-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+
+      # 4. Caricamento dei risultati su GitHub
+      - name: Upload Trivy scans to GitHub Security
+        uses: github/codeql-action/upload-sarif@ce64ddcb0d8d890d2df4a9d1c04ff297367dea2a # v3.35.2
+        if: always()
+        with:
+          # Carichiamo entrambi i report (Trivy permette di farlo unendo i file o caricandoli separatamente)
+          sarif_file: 'trivy-image-results.sarif'
+          category: 'trivy-image'
+
+      # 5. Esempio di Push (solo se vuoi caricarlo da qualche parte)
+      # - name: Push image (optional)
+      #   run: |
+      #     # Qui andrebbe la logica di login e push se i test passano
