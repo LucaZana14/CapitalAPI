@@ -262,7 +262,11 @@ def upgrade() -> None:
     create_articles_to_tags_table()
     create_favorites_table()
     create_commentaries_table()
-    create_new_user(username="Pikachu", email="Pikachu@checkmarx.com", password="snorlax", image="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/30e23551-c869-487d-a6d4-4aa73c102731/d553a9m-94352d40-78c7-433f-b867-801e0a04f563.jpg/v1/fill/w_900,h_900,q_75,strp/pikachu_wallpaper_by_moustachegirl05_d553a9m-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9OTAwIiwicGF0aCI6IlwvZlwvMzBlMjM1NTEtYzg2OS00ODdkLWE2ZDQtNGFhNzNjMTAyNzMxXC9kNTUzYTltLTk0MzUyZDQwLTc4YzctNDMzZi1iODY3LTgwMWUwYTA0ZjU2My5qcGciLCJ3aWR0aCI6Ijw9OTAwIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.MLpVI785Bl0H8UKlTJeqil4l2Dr2lERfgkYCrotQ4Yg")
+    PIKACHU_PWD = os.getenv("PIKACHU_PASSWORD", "default_safe_fallback_123!")
+    BOB_PWD = os.getenv("BOB_PASSWORD", "default_safe_fallback_456!")
+    
+    
+    create_new_user(username="Pikachu", email="Pikachu@checkmarx.com", password="snorlax", image="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png")
     create_new_user(username="Bob_the_dev", email="bob_dev@checkmarx.com", password="IamDev", image="https://res.cloudinary.com/practicaldev/image/fetch/s--h93cj2BI--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/336281/766eff39-964e-4acc-a390-bc0e2bc9d459.jpg")
     create_new_article(slug="Dev_updates_1", title="Dev updates #1",
                        description="First update after launch",
