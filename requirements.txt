@@ -10,7 +10,7 @@ bcrypt==3.2.2
 passlib==1.7.4
 pydantic[email]==1.9.1
 pyjwt==2.4.0
-pypika==0.48.9
+pypika==0.51.1
 slugify==0.0.1
 pydantic[dotenv]==1.9.1
 pydantic==1.9.1
