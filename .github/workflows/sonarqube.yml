@@ -49,7 +49,7 @@ jobs:
 
           token   = os.environ["SONAR_TOKEN"]
           org     = "lucazana14"
-          project = "LucaZana14_php-goof"
+          project = "LucaZana14_CapitalAPI"
           base    = "https://sonarcloud.io"
 
           LEVEL = {
