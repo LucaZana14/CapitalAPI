@@ -13,8 +13,6 @@ jobs:
     name: Analyze
     runs-on: ubuntu-latest
     
-    # Queste autorizzazioni sono obbligatorie affinché CodeQL 
-    # possa scrivere i risultati nella scheda "Security" di GitHub
     permissions:
       actions: read
       contents: read
@@ -23,8 +21,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Qui diciamo a CodeQL quali linguaggi cercare. 
-        # Inserisco Python (FastAPI) e Javascript (Frontend Node.js) in base a quello che abbiamo visto prima.
+        # ATTENZIONE: Lascia qui SOLO i linguaggi che sono effettivamente presenti nel tuo codice sorgente.
+        # Se non hai file JS/TS scritti da te, rimuovi 'javascript' e lascia solo ['python']
         language: [ 'python', 'javascript' ]
 
     steps:
@@ -35,16 +33,11 @@ jobs:
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
-        # Il pacchetto di default è ottimo, ma se vuoi attivare le regole più estreme e severe
-        # per trovare anche bug logici o debito tecnico, decommenta la riga sottostante:
         # queries: security-extended,security-and-quality
 
     - name: Autobuild
-      # Tenta di compilare il codice automaticamente. 
-      # Per Python e JS spesso non fa nulla, ma è un passaggio richiesto dalla pipeline.
       uses: github/codeql-action/autobuild@v3
 
     - name: Esegui l'Analisi CodeQL
+      # Rimosso il parametro 'with: category' perché nella v3 è gestito automaticamente in modo sicuro
       uses: github/codeql-action/analyze@v3
-      with:
-        category: "/language:${{matrix.language}}"
