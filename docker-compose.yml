@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: "postgresql://postgres:postgres@db/postgres"
+      DATABASE_URL: "${DATABASE_URL}"
       APP_ENV: "prod"
     depends_on:
       db:
