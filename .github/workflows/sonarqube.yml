@@ -17,6 +17,7 @@ jobs:
       contents: read
       security-events: write
       actions: read
+
     steps:
       - name: Harden the runner
         uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
@@ -37,7 +38,14 @@ jobs:
           # Passiamo esplicitamente l'organizzazione per evitare dubbi
           args: >
             -Dsonar.organization=lucazana14
-            -Dsonar.projectKey=LucaZana14_php-goof
+            -Dsonar.projectKey=LucaZana14_php-goof 
+
+      - name: Convert SonarCloud issues to SERIF
+        uses: benoit-sns/sarif-sonarcloud@master 
+        if: always()
+
+        env: 
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
 
       - name: Carica i risultati su GitHub Security
         uses: github/codeql-action/upload-sarif@v4  
