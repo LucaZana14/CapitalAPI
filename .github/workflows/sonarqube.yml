@@ -24,7 +24,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@v6 
+      - uses: actions/checkout@v4 
         with:
           fetch-depth: 0
 
@@ -37,7 +37,7 @@ jobs:
         with:
           args: >
             -Dsonar.organization=lucazana14
-            -Dsonar.projectKey=LucaZana14_CapitalAPI
+            -Dsonar.projectKey=Lucazana14_CapitalAPI
 
       - name: Convert SonarCloud issues to SARIF
         if: always()
@@ -46,7 +46,7 @@ jobs:
           SONAR_ORG: "Lucazana14"
           SONAR_PROJECT: "Lucazana14_CapitalAPI"
         run: |
-          python3 - .github/scripts/sonar_to_sarif.py
+          python3 .github/scripts/sonar_to_sarif.py
             
       - name: Carica i risultati su GitHub Security
         uses: github/codeql-action/upload-sarif@v4 

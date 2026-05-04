@@ -52,7 +52,6 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
-          # Eseguiamo Snyk. Se fallisce l'auth, qui vedremo l'errore nei log.
           npx snyk test --all-projects --sarif-file-output=snyk-results.sarif
 
       - name: Carica i risultati su GitHub Security
