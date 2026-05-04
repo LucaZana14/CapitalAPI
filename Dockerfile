@@ -1,5 +1,8 @@
 FROM python:3.9.10-slim
 
+# Subito dopo il FROM inserisci questo:
+RUN apt-get update && apt-get upgrade -y && apt-get clean
+
 # 1. Creiamo l'utente
 RUN useradd -m capitaluser
 WORKDIR /capital
