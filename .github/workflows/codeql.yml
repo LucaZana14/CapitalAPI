@@ -8,6 +8,9 @@ on:
   schedule:
     - cron: '30 2 * * 0' # Esegue una scansione profonda automatica ogni domenica alle 2:30 di notte
 
+permissions:
+  contents: read
+  
 jobs:
   analyze:
     name: Analyze

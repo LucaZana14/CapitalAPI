@@ -16,7 +16,7 @@ services:
     expose:
       - "5432"
     environment:
-      DATABASE_URL: "postgresql://postgres:postgres@localhost/postgres"
+      DATABASE_URL: "${DATABASE_URL}"
     healthcheck:
       test: ["CMD", "psql", "--user=postgres"]
       interval: 10s

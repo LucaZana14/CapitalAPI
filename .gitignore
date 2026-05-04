@@ -111,3 +111,7 @@ postgres-data
 
 # ignore DS_Store
 *.DS_Store
+
+# segreti e configurazioni locali
+
+.env
