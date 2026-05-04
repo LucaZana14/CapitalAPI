@@ -19,13 +19,13 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@v6 
         with:
           fetch-depth: 0 
 
       - name: SonarCloud Scan
         # nosemgrep: generic.secrets.security.detected-sonarqube-docs-api-key.detected-sonarqube-docs-api-key 
-        uses: SonarSource/sonarqube-scan-action@884b79409bbd464b2a59edc326a4b77dc56b2195 # v3.0.0
+        uses: SonarSource/sonarqube-scan-action@v8 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Necessario per decorare le PR
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -34,3 +34,9 @@ jobs:
           args: >
             -Dsonar.organization=lucazana14
             -Dsonar.projectKey=LucaZana14_php-goof
+
+      - name: Carica i risultati su GitHub Security
+        uses: github/codeql-action/upload-sarif@v4  
+        if: always()
+        with:
+          sarif_file: sonarqube.sarif
