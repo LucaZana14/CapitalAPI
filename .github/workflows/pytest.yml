@@ -43,7 +43,7 @@ jobs:
     - name: Setup Python 3.12.0
       uses: actions/setup-python@v5
       with:
-        python-version: '3.15'
+        python-version: '3.12'
         # IL TRUCCO DELLA CACHE: GitHub salverà le librerie pip scaricate
         # velocizzando enormemente le build successive
         cache: 'pip' 
