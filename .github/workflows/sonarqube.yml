@@ -20,35 +20,131 @@ jobs:
 
     steps:
       - name: Harden the runner
-        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@v6 
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
+          fetch-depth: 0
 
       - name: SonarCloud Scan
-        # nosemgrep: generic.secrets.security.detected-sonarqube-docs-api-key.detected-sonarqube-docs-api-key 
-        uses: SonarSource/sonarqube-scan-action@v8 
+        # nosemgrep: generic.secrets.security.detected-sonarqube-docs-api-key.detected-sonarqube-docs-api-key
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Necessario per decorare le PR
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          # Passiamo esplicitamente l'organizzazione per evitare dubbi
           args: >
             -Dsonar.organization=lucazana14
-            -Dsonar.projectKey=LucaZana14_php-goof 
+            -Dsonar.projectKey=LucaZana14_php-goof
 
-      - name: Convert SonarCloud issues to SERIF
-        uses: benoit-sns/sarif-sonarcloud@master 
+      - name: Convert SonarCloud issues to SARIF
         if: always()
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          python3 - <<'EOF'
+          import json, urllib.request, urllib.parse, os, sys
 
-        env: 
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+          token   = os.environ["SONAR_TOKEN"]
+          org     = "lucazana14"
+          project = "LucaZana14_php-goof"
+          base    = "https://sonarcloud.io"
+
+          # Mappa severity Sonar → livello SARIF
+          LEVEL = {
+              "BLOCKER":  "error",
+              "CRITICAL": "error",
+              "MAJOR":    "warning",
+              "MINOR":    "note",
+              "INFO":     "note",
+          }
+
+          def fetch_issues():
+              issues, page, total = [], 1, None
+              while total is None or len(issues) < total:
+                  params = urllib.parse.urlencode({
+                      "componentKeys": project,
+                      "organization":  org,
+                      "ps": 500,
+                      "p":  page,
+                      "statuses": "OPEN,CONFIRMED,REOPENED",
+                  })
+                  url = f"{base}/api/issues/search?{params}"
+                  req = urllib.request.Request(url)
+                  import base64
+                  creds = base64.b64encode(f"{token}:".encode()).decode()
+                  req.add_header("Authorization", f"Basic {creds}")
+                  with urllib.request.urlopen(req) as r:
+                      data = json.load(r)
+                  if total is None:
+                      total = data["total"]
+                      print(f"Totale issue: {total}")
+                  issues.extend(data["issues"])
+                  if len(data["issues"]) < 500:
+                      break
+                  page += 1
+              return issues
+
+          def to_sarif(issues):
+              rules, results = {}, []
+              for i in issues:
+                  rid  = i.get("rule", "unknown")
+                  msg  = i.get("message", "")
+                  sev  = i.get("severity", "MAJOR")
+                  comp = i.get("component", "")
+                  # component ha forma  org:repo:path/to/file
+                  path = comp.split(":", 2)[-1] if ":" in comp else comp
+                  line = i.get("line", 1) or 1
+
+                  if rid not in rules:
+                      rules[rid] = {
+                          "id": rid,
+                          "shortDescription": {"text": rid},
+                          "defaultConfiguration": {"level": LEVEL.get(sev, "warning")},
+                      }
+
+                  results.append({
+                      "ruleId": rid,
+                      "message": {"text": msg},
+                      "level":   LEVEL.get(sev, "warning"),
+                      "locations": [{
+                          "physicalLocation": {
+                              "artifactLocation": {"uri": path, "uriBaseId": "%SRCROOT%"},
+                              "region": {"startLine": line},
+                          }
+                      }],
+                  })
+              return rules, results
+
+          issues = fetch_issues()
+          rules, results = to_sarif(issues)
+
+          sarif = {
+              "version": "2.1.0",
+              "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+              "runs": [{
+                  "tool": {
+                      "driver": {
+                          "name": "SonarCloud",
+                          "version": "1.0",
+                          "informationUri": "https://sonarcloud.io",
+                          "rules": list(rules.values()),
+                      }
+                  },
+                  "results": results,
+              }],
+          }
+
+          with open("sonarcloud.sarif", "w") as f:
+              json.dump(sarif, f, indent=2)
+
+          print(f"SARIF generato: {len(results)} risultati, {len(rules)} regole")
+          EOF
 
       - name: Carica i risultati su GitHub Security
-        uses: github/codeql-action/upload-sarif@v4  
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
-          sarif_file: sonarqube.sarif
+          sarif_file: sonarcloud.sarif
