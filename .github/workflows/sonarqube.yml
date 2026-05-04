@@ -43,7 +43,7 @@ jobs:
         if: always()
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_ORG: "LucaZana14"
+          SONAR_ORG: "lucazana14"
           SONAR_PROJECT: "LucaZana14_CapitalAPI"
         run: |
           python3 .github/scripts/sonar_to_sarif.py
