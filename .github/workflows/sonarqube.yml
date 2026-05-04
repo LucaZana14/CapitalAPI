@@ -53,10 +53,10 @@ jobs:
           base    = "https://sonarcloud.io"
 
           LEVEL = {
-              "BLOCKER":  "error",
-              "CRITICAL": "error",
-              "MAJOR":    "warning",
-              "MINOR":    "note",
+              "BLOCKER":  "critical",
+              "CRITICAL": "critical",
+              "MAJOR":    "high",
+              "MINOR":    "medium",
               "INFO":     "note",
           }
 
