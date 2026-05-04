@@ -55,7 +55,7 @@ jobs:
         if: always()
         with:
           # Carichiamo entrambi i report (Trivy permette di farlo unendo i file o caricandoli separatamente)
-          sarif_file: 'trivy-image-results.sarif'
+          sarif_file: '.'
           category: 'trivy-image'
 
       # 5. Esempio di Push (solo se vuoi caricarlo da qualche parte)

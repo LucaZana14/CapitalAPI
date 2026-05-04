@@ -10,7 +10,7 @@ on:
 
 permissions:
   contents: read
-  
+
 jobs:
   analyze:
     name: Analyze
@@ -24,8 +24,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # ATTENZIONE: Lascia qui SOLO i linguaggi che sono effettivamente presenti nel tuo codice sorgente.
-        # Se non hai file JS/TS scritti da te, rimuovi 'javascript' e lascia solo ['python']
         language: [ 'python', 'javascript' ]
 
     steps:
@@ -42,5 +40,4 @@ jobs:
       uses: github/codeql-action/autobuild@v3
 
     - name: Esegui l'Analisi CodeQL
-      # Rimosso il parametro 'with: category' perché nella v3 è gestito automaticamente in modo sicuro
       uses: github/codeql-action/analyze@v3
