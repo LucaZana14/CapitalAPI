@@ -27,3 +27,6 @@ USER capitaluser
 
 # 7. AVVIO
 CMD ["python3", "main.py"]
+
+# Usa Python per fare una richiesta alla rotta principale dell'API
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/')" || exit 1
