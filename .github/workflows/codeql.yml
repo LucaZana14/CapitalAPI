@@ -1,0 +1,50 @@
+name: "CodeQL Advanced Security"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '30 2 * * 0' # Esegue una scansione profonda automatica ogni domenica alle 2:30 di notte
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    
+    # Queste autorizzazioni sono obbligatorie affinché CodeQL 
+    # possa scrivere i risultati nella scheda "Security" di GitHub
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Qui diciamo a CodeQL quali linguaggi cercare. 
+        # Inserisco Python (FastAPI) e Javascript (Frontend Node.js) in base a quello che abbiamo visto prima.
+        language: [ 'python', 'javascript' ]
+
+    steps:
+    - name: Checkout del codice
+      uses: actions/checkout@v4
+
+    - name: Inizializza CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        # Il pacchetto di default è ottimo, ma se vuoi attivare le regole più estreme e severe
+        # per trovare anche bug logici o debito tecnico, decommenta la riga sottostante:
+        # queries: security-extended,security-and-quality
+
+    - name: Autobuild
+      # Tenta di compilare il codice automaticamente. 
+      # Per Python e JS spesso non fa nulla, ma è un passaggio richiesto dalla pipeline.
+      uses: github/codeql-action/autobuild@v3
+
+    - name: Esegui l'Analisi CodeQL
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"

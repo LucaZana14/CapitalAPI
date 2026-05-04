@@ -33,7 +33,7 @@ jobs:
       - name: Esegui Semgrep CI
         # Usiamo il comando nativo "semgrep ci" che legge il token,
         # scarica le tue regole dalla dashboard e genera il SARIF.
-        run: semgrep scan --config="p/default" --verbose --sarif --output=semgrep.sarif
+        run: semgrep scan --config="p/fastapi" --verbose --sarif --output=semgrep.sarif
         continue-on-error: true
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
