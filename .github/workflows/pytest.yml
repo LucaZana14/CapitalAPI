@@ -53,7 +53,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         # Installiamo pytest e i plugin essenziali per FastAPI
-        pip install pytest pytest-cov httpx
+        pip install pytest pytest-cov httpx asgi_lifespan pytest-asyncio
 
     - name: Esecuzione dei Test con Pytest
       env:
