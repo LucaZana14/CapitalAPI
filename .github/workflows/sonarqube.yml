@@ -37,7 +37,7 @@ jobs:
         with:
           args: >
             -Dsonar.organization=lucazana14
-            -Dsonar.projectKey=LucaZana14_php-goof
+            -Dsonar.projectKey=LucaZana14_CapitalAPI
 
       - name: Convert SonarCloud issues to SARIF
         if: always()
@@ -53,11 +53,19 @@ jobs:
           base    = "https://sonarcloud.io"
 
           LEVEL = {
-              "BLOCKER":  "critical",
-              "CRITICAL": "critical",
-              "MAJOR":    "high",
-              "MINOR":    "medium",
+              "BLOCKER":  "error",
+              "CRITICAL": "error",
+              "MAJOR":    "error",
+              "MINOR":    "warning",
               "INFO":     "note",
+          }
+
+          SCORE = {
+              "BLOCKER":  "9.5",
+              "CRITICAL": "9.0",
+              "MAJOR":    "7.5",
+              "MINOR":    "5.5",
+              "INFO":     "2.0",          
           }
 
           def api_get(path, params=None):
