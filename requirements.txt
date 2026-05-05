@@ -57,3 +57,4 @@ asyncpg
 loguru
 aiosql
 bcrypt
+passlib
