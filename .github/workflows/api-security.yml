@@ -35,7 +35,9 @@ jobs:
 
       # 3. Estrazione dello schema OpenAPI (Usa il tuo script extract_openapi.py)
       - name: Extract OpenAPI Schema
-        run: python extract_openapi.py
+        env: 
+            DATABASE_URL: "postgresql://finto_user:finta_password@localhost:5432/finto_db"
+        run: python3 extract_openapi.py
 
       - name: Upload OpenAPI Json come artefatto
         uses: actions/upload-artifact@v4
