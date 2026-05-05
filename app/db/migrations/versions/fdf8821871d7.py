@@ -259,11 +259,12 @@ def create_new_article(slug, title, description, body, author_id, tags=[]) -> No
     )
     for row in res:
         if tags:
-            add_tags(tags, row[0]) # Fix: SQLAlchemy 2.0 uses index or mapped row, row[0] is safer for RETURNING id
+            add_tags(tags, row[0]) 
 
 
 def create_new_comment(body, author_id, article_id) -> None:
-    op.execute(
+    # ECCO LA CORREZIONE! op.execute -> op.get_bind().execute
+    op.get_bind().execute(
         sa.text(
             """
             INSERT INTO commentaries (body, author_id, article_id)
@@ -354,7 +355,6 @@ def upgrade() -> None:
     create_new_comment(body="Im the first! Im the first!", author_id=5, article_id=8)
     create_new_comment(body="Oh no.. I never have luck with that, I wish I could be the first comment", author_id=2, article_id=8)
 
-    # Corretto l'Hardcoded Secret del Team Rocket
     create_new_user(username="TeamR$cket", email="TeamR$cket@checkmarx.com", password=TEAMROCKET_PWD, image="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/110.png")
     create_new_article(slug="TeamR$cket", title="TeamR$cket", description="Money Money",
                        body="We have so much money, we will win everyone!", author_id=8,
