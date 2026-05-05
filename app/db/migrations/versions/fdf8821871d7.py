@@ -221,7 +221,7 @@ def create_new_user(username, email, password, admin=False, image="") -> None:
     salt = security.generate_salt()
     hashed_password = security.get_password_hash(salt + password)
 
-    op.execute(
+    op.get_bind().execute(
         sa.text(
             """
             INSERT INTO users(username, email, salt, hashed_password, admin, image)
