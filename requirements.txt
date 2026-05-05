@@ -49,7 +49,7 @@ wcwidth==0.2.14
 xlsxwriter==3.2.9
 zipp==3.23.0
 alembic
-pydantic
+pydantic<2.0.0
 fastapi
 uvicorn
 sqlalchemy
