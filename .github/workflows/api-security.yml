@@ -1,0 +1,71 @@
+name: "API Design & Security Scan"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  spectral-scan:
+    name: "Spectral API Linting"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 1. Setup dell'ambiente Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # 2. Installazione dipendenze per l'estrazione
+      - name: Install FastAPI & Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install fastapi uvicorn
+          # Se il tuo main.py ha bisogno di altre librerie (es. pydantic, sqlalchemy), aggiungile qui:
+          # pip install -r requirements.txt 
+
+      # 3. Estrazione dello schema OpenAPI (Usa il tuo script extract_openapi.py)
+      - name: Extract OpenAPI Schema
+        run: python extract_openapi.py
+
+      - name: Upload OpenAPI Json come artefatto
+        uses: actions/upload-artifact@v4
+        with:
+            name: openapi-schema-file
+            path: openapi.json
+
+
+
+      # 4. Installazione di Spectral e del formattatore SARIF
+      - name: Install Spectral CLI
+        run: |
+          npm install -g @stoplight/spectral-cli
+          npm install -g @stoplight/spectral-sarif-formatter
+
+      # 5. Scansione con Spectral
+      # Usiamo "|| true" per evitare che il build fallisca se ci sono solo warning, 
+      # permettendo l'upload del report.
+      - name: Run Spectral Scan
+        run: |
+          spectral lint openapi.json \
+            --ruleset .spectral.yaml \
+            --format sarif \
+            --output spectral-results.sarif || true
+
+      # 6. Caricamento dei risultati su GitHub Security
+      - name: Upload Spectral results to GitHub
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() # Carica il report anche se Spectral ha trovato errori
+        with:
+          sarif_file: spectral-results.sarif
+          category: spectral-api-linting
