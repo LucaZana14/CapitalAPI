@@ -8,4 +8,5 @@ command.current(alembic_cfg, verbose=True)
 command.upgrade(alembic_cfg, "fdf8821871d7")
 
 app = get_application()
-uvicorn.run(app, host='0.0.0.0')
+if __name__ == "__main__":
+    uvicorn.run(app, host='0.0.0.0')
