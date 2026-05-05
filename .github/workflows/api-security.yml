@@ -29,10 +29,9 @@ jobs:
       # 2. Installazione dipendenze per l'estrazione
       - name: Install FastAPI & Dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install fastapi uvicorn
-          # Se il tuo main.py ha bisogno di altre librerie (es. pydantic, sqlalchemy), aggiungile qui:
-          # pip install -r requirements.txt 
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt
+          
 
       # 3. Estrazione dello schema OpenAPI (Usa il tuo script extract_openapi.py)
       - name: Extract OpenAPI Schema
