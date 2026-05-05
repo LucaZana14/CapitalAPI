@@ -91,3 +91,4 @@ slugify
 pycparser
 cffi
 cryptography
+psycopg2
