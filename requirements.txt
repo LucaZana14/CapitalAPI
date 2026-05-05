@@ -54,3 +54,4 @@ fastapi
 uvicorn
 sqlalchemy
 asyncpg
+loguru
