@@ -2,6 +2,6 @@ extends:
   - spectral:oas
   - spectral:asyncapi
   - spectral:arazzo
-  - https://unpkg.com/@stoplight/spectral-owasp-ruleset/dist/ruleset.js
+  - "@stoplight/spectral-owasp-ruleset"
 
 rules: {}

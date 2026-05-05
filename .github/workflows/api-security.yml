@@ -63,18 +63,22 @@ jobs:
 
 
       # 4. Installazione di Spectral e del formattatore SARIF
-      - name: Install Spectral CLI
-        run: npm install -g @stoplight/spectral-cli
-
-      - name: Run Spectral Scan
-        # Rimuoviamo il doppio flag e usiamo la sintassi corretta
-        # Non usare "|| true" per ora, così se c'è un errore di sintassi lo vediamo subito
+      - name: Install Spectral and OWASP Ruleset
         run: |
+          npm install -g @stoplight/spectral-cli
+          # Installiamo il pacchetto delle regole localmente nel runner
+          npm install @stoplight/spectral-owasp-ruleset
+
+      # 5. Scansione con Spectral
+      - name: Run Spectral Scan
+        run: |
+          # Usiamo il flag -v (verbose) così se c'è un errore vediamo tutto
           spectral lint openapi.json \
             --ruleset .spectral.yaml \
             --format sarif \
-            --output spectral-results.sarif
-            
+            --output spectral-results.sarif \
+            --fail-severity=warn
+
       # 6. Caricamento dei risultati su GitHub Security
       - name: Upload Spectral results to GitHub
         uses: github/codeql-action/upload-sarif@v4
