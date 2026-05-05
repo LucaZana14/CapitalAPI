@@ -56,7 +56,7 @@ sqlalchemy
 asyncpg
 loguru
 aiosql
-bcrypt
+bcrypt<4.0.0
 passlib
 email-validator
 jwt
