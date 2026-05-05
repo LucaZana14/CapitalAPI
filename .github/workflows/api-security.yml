@@ -52,6 +52,9 @@ jobs:
       - name: Extract OpenAPI Schema
         env: 
             DATABASE_URL: "postgresql://finto_user:pwd@localhost:5432/finto_db"
+            FIRST_SUPERUSER_PASSWORD: "short"
+            ADMIN_PASSWORD: "short"
+            SECRET_KEY: "finta_chiave_segreta_cortissima"
         run: python3 extract_openapi.py
 
       - name: Upload OpenAPI Json come artefatto
