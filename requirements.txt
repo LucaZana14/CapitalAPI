@@ -56,3 +56,4 @@ sqlalchemy
 asyncpg
 loguru
 aiosql
+bcrypt
