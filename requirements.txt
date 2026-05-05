@@ -88,3 +88,6 @@ tomli
 six
 pypika
 slugify
+pycparser
+cffi
+cryptography
