@@ -21,7 +21,7 @@ jobs:
         image: postgres:15
         env:
           POSTGRES_USER: finto_user
-          POSTGRES_PASSWORD: finta_password
+          POSTGRES_PASSWORD: pwd
           POSTGRES_DB: finto_db
         ports:
           - 5432:5432
