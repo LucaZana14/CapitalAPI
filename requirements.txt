@@ -87,3 +87,4 @@ annotated-doc
 tomli
 six
 pypika
+slugify
