@@ -48,3 +48,8 @@ tzdata==2025.3
 wcwidth==0.2.14
 xlsxwriter==3.2.9
 zipp==3.23.0
+alembic
+pydantic
+fastapi
+uvicorn
+sqlalchemy
