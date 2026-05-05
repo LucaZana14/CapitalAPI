@@ -58,3 +58,4 @@ loguru
 aiosql
 bcrypt
 passlib
+email-validator
