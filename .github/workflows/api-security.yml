@@ -64,9 +64,7 @@ jobs:
 
       # 4. Installazione di Spectral e del formattatore SARIF
       - name: Install Spectral CLI
-        run: |
-          npm install -g @stoplight/spectral-cli
-          npm install -g @stoplight/spectral-sarif-formatter
+        run: npm install -g @stoplight/spectral-cli
 
       # 5. Scansione con Spectral
       # Usiamo "|| true" per evitare che il build fallisca se ci sono solo warning, 
