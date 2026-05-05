@@ -66,20 +66,19 @@ jobs:
       - name: Install Spectral CLI
         run: npm install -g @stoplight/spectral-cli
 
-      # 5. Scansione con Spectral
-      # Usiamo "|| true" per evitare che il build fallisca se ci sono solo warning, 
-      # permettendo l'upload del report.
       - name: Run Spectral Scan
+        # Rimuoviamo il doppio flag e usiamo la sintassi corretta
+        # Non usare "|| true" per ora, così se c'è un errore di sintassi lo vediamo subito
         run: |
-          spectral lint openapi.json -r .spectral.yaml \
+          spectral lint openapi.json \
             --ruleset .spectral.yaml \
             --format sarif \
-            --output spectral-results.sarif || true
+            --output spectral-results.sarif
 
       # 6. Caricamento dei risultati su GitHub Security
       - name: Upload Spectral results to GitHub
         uses: github/codeql-action/upload-sarif@v4
-        if: always()
+        if: always() # Questo assicura che il caricamento avvenga anche se ci sono warning/errori
         with:
           sarif_file: spectral-results.sarif
           category: spectral-api-linting
