@@ -86,3 +86,4 @@ async_timeout
 annotated-doc
 tomli
 six
+pypika
