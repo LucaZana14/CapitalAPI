@@ -71,7 +71,7 @@ jobs:
       # permettendo l'upload del report.
       - name: Run Spectral Scan
         run: |
-          spectral lint openapi.json \
+          spectral lint openapi.json -r .spectral.yaml \
             --ruleset .spectral.yaml \
             --format sarif \
             --output spectral-results.sarif || true
@@ -79,7 +79,7 @@ jobs:
       # 6. Caricamento dei risultati su GitHub Security
       - name: Upload Spectral results to GitHub
         uses: github/codeql-action/upload-sarif@v4
-        if: always() # Carica il report anche se Spectral ha trovato errori
+        if: always()
         with:
           sarif_file: spectral-results.sarif
           category: spectral-api-linting

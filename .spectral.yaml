@@ -1,1 +1,8 @@
 extends: ["spectral:oas", "spectral:asyncapi", "spectral:arazzo"]
+extends: https://unpkg.com/@stoplight/spectral-owasp-ruleset/dist/ruleset.js
+rules:
+  # Qui puoi attivare/disattivare regole specifiche o cambiare la gravità
+  owasp:api1:2019: error # Broken Object Level Authorization
+  owasp:api2:2019: error # Broken User Authentication
+  owasp:api3:2019: error # Excessive Data Exposure
+  owasp:api4:2019: error # Lack of Resources & Rate Limiting
