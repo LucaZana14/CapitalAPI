@@ -55,3 +55,4 @@ uvicorn
 sqlalchemy
 asyncpg
 loguru
+aiosql
