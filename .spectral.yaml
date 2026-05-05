@@ -3,15 +3,5 @@ extends:
   - spectral:asyncapi
   - spectral:arazzo
   - https://unpkg.com/@stoplight/spectral-owasp-ruleset/dist/ruleset.js
-rules:
-  # Qui puoi attivare/disattivare regole specifiche o cambiare la gravità
-  owasp-api1-2019: error
-  owasp-api2-2019: error
-  owasp-api3-2019: error
-  owasp-api4-2019: error
-  owasp-api5-2019: error
-  owasp-api6-2019: error
-  owasp-api7-2019: error
-  owasp-api8-2019: error
-  owasp-api9-2019: error
-  owasp-api10-2019: error
+
+rules: {}
