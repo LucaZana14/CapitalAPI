@@ -1,74 +1,30 @@
-name: "API Design & Security Scan"
+name: API Security Scan
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  security-events: write
 
 jobs:
-  spectral-scan:
-    name: "Spectral API Linting"
+  spectral-lint:
+    name: Spectral API Linting
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: finto_user
-          POSTGRES_PASSWORD: pwd
-          POSTGRES_DB: finto_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 1. Setup dell'ambiente Python
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.10'
+          node-version: '20'
 
-      # 2. Installazione dipendenze per l'estrazione
-      - name: Install FastAPI & Dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install -r requirements.txt
-          
-
-      # 3. Estrazione dello schema OpenAPI (Usa il tuo script extract_openapi.py)
-      - name: Extract OpenAPI Schema
-        env: 
-            DATABASE_URL: "postgresql://finto_user:pwd@localhost:5432/finto_db"
-        run: python3 extract_openapi.py
-
-      - name: Upload OpenAPI Json come artefatto
-        uses: actions/upload-artifact@v4
-        with:
-            name: openapi-schema-file
-            path: openapi.json
-
-
-
-      # 4. Installazione di Spectral (Rimuoviamo il pacchetto rotto)
       - name: Install Spectral and OWASP
         run: |
           npm init -y
           npm install @stoplight/spectral-cli @stoplight/spectral-owasp-ruleset
 
-      # 5. Scansione con Spectral in formato JSON
       - name: Run Spectral Scan
         continue-on-error: true
         run: |
@@ -77,17 +33,14 @@ jobs:
             --format json \
             --output spectral-results.json
 
-# 6. Il nostro Convertitore Infallibile (Ora con Snippet di codice!)
       - name: Convert JSON to SARIF
         run: |
           cat << 'EOF' > convert.py
           import json
           
-          # Leggiamo gli errori
           with open("spectral-results.json", "r") as f:
               issues = json.load(f)
               
-          # Leggiamo il vero file OpenAPI per estrarre il testo
           with open("openapi.json", "r") as f:
               openapi_lines = f.readlines()
           
@@ -109,20 +62,12 @@ jobs:
               sev = issue.get("severity", 1)
               level = "error" if sev == 0 else "warning" if sev == 1 else "note"
               
-              # Troviamo la riga esatta e prendiamo 5 righe prima e 5 dopo
               line_idx = issue.get("range", {}).get("start", {}).get("line", 0)
-              start_line = max(0, line_idx - 5)
-              end_line = min(len(openapi_lines), line_idx + 6)
-              snippet = "".join(openapi_lines[start_line:end_line])
-              
-              # Creiamo un messaggio Markdown bellissimo per GitHub
-              msg_text = issue.get("message", "")
-              msg_markdown = f"{msg_text}\n\n**Contesto nel JSON (riga {line_idx + 1}):**\n```json\n{snippet}\n```"
               
               sarif["runs"][0]["results"].append({
                   "ruleId": rule_id,
                   "level": level,
-                  "message": {"text": msg_text, "markdown": msg_markdown},
+                  "message": {"text": issue.get("message", "")},
                   "locations": [{
                       "physicalLocation": {
                           "artifactLocation": {"uri": "openapi.json"},
@@ -141,7 +86,6 @@ jobs:
           EOF
           python3 convert.py
 
-      # 7. Upload su GitHub Security
       - name: Upload Spectral results to GitHub
         uses: github/codeql-action/upload-sarif@v4
         if: always()
