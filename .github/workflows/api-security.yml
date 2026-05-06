@@ -77,14 +77,19 @@ jobs:
             --format json \
             --output spectral-results.json
 
-      # 6. Il nostro Convertitore Infallibile (Python)
+# 6. Il nostro Convertitore Infallibile (Ora con Snippet di codice!)
       - name: Convert JSON to SARIF
         run: |
           cat << 'EOF' > convert.py
           import json
           
+          # Leggiamo gli errori
           with open("spectral-results.json", "r") as f:
               issues = json.load(f)
+              
+          # Leggiamo il vero file OpenAPI per estrarre il testo
+          with open("openapi.json", "r") as f:
+              openapi_lines = f.readlines()
           
           sarif = {
               "version": "2.1.0",
@@ -99,23 +104,30 @@ jobs:
           for issue in issues:
               rule_id = str(issue.get("code", "unknown"))
               if rule_id not in rules:
-                  rules[rule_id] = {
-                      "id": rule_id, 
-                      "shortDescription": {"text": issue.get("message", "")}
-                  }
+                  rules[rule_id] = {"id": rule_id, "shortDescription": {"text": issue.get("message", "")}}
               
               sev = issue.get("severity", 1)
               level = "error" if sev == 0 else "warning" if sev == 1 else "note"
               
+              # Troviamo la riga esatta e prendiamo 5 righe prima e 5 dopo
+              line_idx = issue.get("range", {}).get("start", {}).get("line", 0)
+              start_line = max(0, line_idx - 5)
+              end_line = min(len(openapi_lines), line_idx + 6)
+              snippet = "".join(openapi_lines[start_line:end_line])
+              
+              # Creiamo un messaggio Markdown bellissimo per GitHub
+              msg_text = issue.get("message", "")
+              msg_markdown = f"{msg_text}\n\n**Contesto nel JSON (riga {line_idx + 1}):**\n```json\n{snippet}\n```"
+              
               sarif["runs"][0]["results"].append({
                   "ruleId": rule_id,
                   "level": level,
-                  "message": {"text": issue.get("message", "")},
+                  "message": {"text": msg_text, "markdown": msg_markdown},
                   "locations": [{
                       "physicalLocation": {
                           "artifactLocation": {"uri": "openapi.json"},
                           "region": {
-                              "startLine": issue.get("range", {}).get("start", {}).get("line", 0) + 1,
+                              "startLine": line_idx + 1,
                               "startColumn": issue.get("range", {}).get("start", {}).get("character", 0) + 1
                           }
                       }
