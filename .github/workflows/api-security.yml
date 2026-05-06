@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions: 
+  contents: read
+  security-events: write
+  
 jobs:
   spectral-lint:
     name: Spectral API Linting
