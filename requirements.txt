@@ -62,7 +62,6 @@ email-validator
 jwt
 pytz 
 alembic
-pydantic<2.0.0
 fastapi
 uvicorn
 sqlalchemy
