@@ -36,9 +36,6 @@ jobs:
           php-version: '8.3'
           tools: composer:v2
 
-      - name : Install php dependencies
-        run : composer install --prefer-dist --no-progress --no-scripts
-
       - name: Setup Python
         uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
